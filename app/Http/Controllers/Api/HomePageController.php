@@ -12,6 +12,7 @@ class HomePageController extends Controller
     {
         $user = Auth::user();
 
+        $userType = $user->user_type;
         return response()->json([
             'status' => 'success',
             'is_logged_in' => $user ? true : false,
