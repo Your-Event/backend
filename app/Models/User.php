@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, HasName
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $appends = ['name'];
 
     /**
      * The attributes that are mass assignable.
@@ -101,6 +106,26 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Post::class, 'favorite_post', 'user_id', 'post_id')
             ->withTimestamps();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->email === 'admin@example.com';
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->full_name ?? $this->email;
+    }
+
+    public function getNameAttribute(): string
+    {
+        return $this->full_name ?? $this->email;
+    }
+
+    public function getFilamentNameFor(): string
+    {
+        return $this->full_name ?? $this->email;
     }
 
 }
