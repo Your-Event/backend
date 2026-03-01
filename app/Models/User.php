@@ -27,7 +27,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         'email',
         'email_verify',
         'password',
-        'user_type',
+        'user_type_id',
         'role_id',
         'full_name',
         'gender',
@@ -65,6 +65,14 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function userType(): BelongsTo
+    {
+        return $this->belongsTo(UserType::class);
     }
 
     public function image()
@@ -110,7 +118,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->email === 'admin@example.com';
+        return $this->userType && $this->userType->name === 'Admin';
     }
 
     public function getFilamentName(): string

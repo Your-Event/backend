@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('user_type', ['Showman', 'Company', 'Client']);
+            $table->foreignId('user_type_id')->constrained('user_types');
             $table->foreignId('role_id')->nullable()->constrained('roles');
             $table->string('full_name')->nullable();
             $table->enum('gender', ['male', 'female'])->nullable();

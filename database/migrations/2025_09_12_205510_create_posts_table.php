@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('sub_type_id')->constrained('post_sub_types')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->foreignId('price_unit_id')->nullable()->constrained('price_units')->onDelete('cascade');
             $table->boolean('is_verified');

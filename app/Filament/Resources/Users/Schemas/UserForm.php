@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Schemas;
+namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -18,12 +18,18 @@ class UserForm
                     ->label('Email address')
                     ->email()
                     ->required(),
-                DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()
                     ->required(),
-                TextInput::make('user_type')
-                    ->required(),
+                Select::make('user_type')
+                    ->label('User Type')
+                    ->options([
+                        'Showman' => 'Showman',
+                        'Company' => 'Company',
+                        'Client'  => 'Client',
+                    ])
+                    ->required()
+                    ->native(false),
                 Select::make('role_id')
                     ->relationship('role', 'title'),
                 TextInput::make('full_name'),
