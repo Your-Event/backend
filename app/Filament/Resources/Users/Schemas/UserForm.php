@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class UserForm
 {
@@ -18,26 +19,51 @@ class UserForm
                     ->label('Email address')
                     ->email()
                     ->required(),
+
                 TextInput::make('password')
                     ->password()
-                    ->required(),
-                Select::make('user_type')
+                    ->required(fn (string $operation) => $operation === 'create')
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? Hash::make($state) : null)
+                    ->dehydrated(fn ($state) => filled($state)),
+
+                Select::make('user_type_id')
                     ->label('User Type')
-                    ->options([
-                        'Showman' => 'Showman',
-                        'Company' => 'Company',
-                        'Client'  => 'Client',
-                    ])
+                    ->relationship('userType', 'name')
+                    ->preload()
+                    ->reactive()
                     ->required()
                     ->native(false),
+
                 Select::make('role_id')
-                    ->relationship('role', 'title'),
+                    ->label('Role')
+                    ->options(function (callable $get) {
+                        $userTypeId = $get('user_type_id');
+
+                        if (!$userTypeId) {
+                            return [];
+                        }
+
+                        return Role::whereHas('userTypes', function ($q) use ($userTypeId) {
+                            $q->where('user_types.id', $userTypeId);
+                        })->pluck('title', 'id');
+                    })
+                    ->native(false)
+                    ->searchable(),
+
                 TextInput::make('full_name'),
-                TextInput::make('gender'),
+                Select::make('gender')
+                ->options([
+                    'male' => 'Male',
+                    'female' => 'Female',
+                ])
+                ->native(false),
+
                 FileUpload::make('image_path')
                     ->image(),
+
                 FileUpload::make('wall_image_path')
                     ->image(),
+
                 TextInput::make('bio'),
             ]);
     }
