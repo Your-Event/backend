@@ -29,6 +29,10 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('full_name')
                     ->searchable(),
+                TextColumn::make('phones.phone')
+                    ->label('Phone')
+                    ->listWithLineBreaks()
+                    ->searchable(),
                 TextColumn::make('gender')
                     ->searchable(),
                 TextColumn::make('created_at')
