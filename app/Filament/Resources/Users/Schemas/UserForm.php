@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
@@ -65,6 +67,34 @@ class UserForm
                     ->image(),
 
                 TextInput::make('bio'),
+
+                Repeater::make('phones')
+                    ->label('Phone Numbers')
+                    ->relationship()
+                    ->schema([
+                        TextInput::make('phone')
+                            ->label('Phone Number')
+                            ->tel()
+                            ->required(),
+                        TextInput::make('last_used_code')
+                            ->label('Last Used Code'),
+                        TimePicker::make('shift_start')
+                            ->label('Shift Start')
+                            ->seconds(false)
+                            ->native(false)
+                            ->format('H:i')
+                            ->displayFormat('H:i')
+                            ->suffixIcon('heroicon-o-clock'),
+                        TimePicker::make('shift_end')
+                            ->label('Shift End')
+                            ->seconds(false)
+                            ->native(false)
+                            ->format('H:i')
+                            ->displayFormat('H:i'),
+                    ])
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => $state['phone'] ?? null)
+                    ->addActionLabel('Add Phone'),
             ]);
     }
 }
