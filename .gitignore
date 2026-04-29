@@ -1,24 +1,130 @@
-*.log
+# =========================
+
+# GLOBAL
+
+# =========================
+
 .DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
 Thumbs.db
+*.log
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+
+# ENV FILES
+
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+
+# DOCKER
+
+# =========================
+
+docker-compose.override.yml
+
+# =========================
+
+# BACKEND (Laravel)
+
+# =========================
+
+backend/vendor/
+backend/node_modules/
+
+backend/storage/*.key
+backend/storage/logs/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/app/*
+!backend/storage/app/public/
+
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitignore
+
+# Laravel build/public (optional)
+
+backend/public/storage
+backend/public/hot
+
+# PHPUnit
+
+backend/.phpunit.result.cache
+
+# =========================
+
+# FRONTEND (Next.js)
+
+# =========================
+
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Next.js env
+
+frontend/.env*
+!frontend/.env.example
+
+# Logs
+
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# =========================
+
+# PACKAGE MANAGERS
+
+# =========================
+
+node_modules/
+vendor/
+
+# =========================
+
+# IDE / EDITOR
+
+# =========================
+
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# =========================
+
+# OS GENERATED FILES
+
+# =========================
+
+*.swp
+*.swo
+
+# =========================
+
+# TEST / COVERAGE
+
+# =========================
+
+coverage/
+*.lcov
+
+# =========================
+
+# MISC
+
+# =========================
+
+tmp/
+temp/

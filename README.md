@@ -1,59 +1,201 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# YourEvent - Unified Docker Setup
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project uses a **clean, unified Docker architecture** with separate services for Laravel backend, Next.js frontend, MySQL database, and Redis cache.
 
-## About Laravel
+## 🏗️ Architecture
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```
+├── backend/                 # Laravel application
+├── frontend/                # Next.js application  
+├── docker/                  # Docker configurations
+│   ├── php/
+│   │   ├── Dockerfile       # Laravel PHP-FPM
+│   │   └── supervisor.conf  # Queue worker config
+│   ├── nginx/
+│   │   └── default.conf     # Nginx configuration
+│   └── node/
+│       └── Dockerfile       # Next.js Node.js
+├── docker-compose.yml       # Main orchestration
+└── README.md               # This file
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Quick Start
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Environment Setup
+```bash
+# Copy environment files
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+```
 
-## Learning Laravel
+### 2. Start All Services
+```bash
+docker-compose up -d
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 3. Install Dependencies
+```bash
+# Laravel dependencies
+docker-compose exec php composer install
+docker-compose exec php php artisan key:generate
+docker-compose exec php php artisan migrate
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Frontend dependencies  
+docker-compose exec node npm install
+```
 
-## Laravel Sponsors
+### 4. Access Applications
+- **Laravel API**: http://localhost:8080
+- **Next.js Frontend**: http://localhost:3000
+- **MySQL**: localhost:3306
+- **Redis**: localhost:6379
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📋 Services
 
-### Premium Partners
+| Service | Technology | Port | Purpose |
+|---------|-------------|------|---------|
+| `php` | Laravel 12 + PHP 8.2 | 9000 | Backend API + Queue Worker |
+| `nginx` | Nginx Alpine | 8080 | Web server for Laravel |
+| `node` | Next.js 16 + Node 18 | 3000 | Frontend application |
+| `mysql` | MySQL 8.0 | 3306 | Database |
+| `redis` | Redis 7 | 6379 | Cache & Sessions |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🔧 Development Workflow
 
-## Contributing
+### Laravel Commands
+```bash
+# Run migrations
+docker-compose exec php php artisan migrate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Create migration
+docker-compose exec php php artisan make:migration create_table_name
 
-## Code of Conduct
+# Clear cache
+docker-compose exec php php artisan cache:clear
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Queue worker (runs automatically via supervisor)
+docker-compose exec php php artisan queue:work
+```
 
-## Security Vulnerabilities
+### Frontend Commands
+```bash
+# Install dependencies
+docker-compose exec node npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Development server (auto-reloads)
+docker-compose exec node npm run dev
 
-## License
+# Build for production
+docker-compose exec node npm run build
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Docker Management
+```bash
+# View logs
+docker-compose logs -f
+
+# Restart specific service
+docker-compose restart php
+
+# Rebuild containers
+docker-compose up -d --build
+
+# Stop everything
+docker-compose down
+```
+
+## 🌐 Networking & Communication
+
+### Internal Service Communication
+- **Laravel → MySQL**: `mysql:3306`
+- **Laravel → Redis**: `redis:6379`
+- **Next.js → Laravel**: `http://nginx:80`
+
+### Environment Variables
+```env
+# Backend (.env)
+DB_HOST=mysql
+REDIS_HOST=redis
+
+# Frontend (.env.local)
+NEXT_PUBLIC_API_URL=http://nginx:80
+```
+
+## 🔄 Hot Reload & Development
+
+- **Next.js**: Automatic hot reload on port 3000
+- **Laravel**: Code changes reflected immediately (PHP-FPM)
+- **Frontend assets**: Rebuild with `npm run build` in php container
+
+## 📦 Volumes & Persistence
+
+- **MySQL data**: `mysql_data` volume
+- **Redis data**: `redis_data` volume  
+- **Laravel code**: Mounted from `./backend`
+- **Frontend code**: Mounted from `./frontend`
+- **Node modules**: Isolated in container
+
+## 🛠️ Production Considerations
+
+- Use HTTPS with SSL certificates
+- Set strong database passwords
+- Enable proper logging and monitoring
+- Use environment-specific configurations
+- Regular backups of MySQL data
+
+## 🧹 Cleanup
+
+```bash
+# Stop and remove all containers
+docker-compose down -v
+
+# Remove all Docker images
+docker system prune -a
+
+# Rebuild from scratch
+docker-compose up -d --build
+```
+
+## 📁 Final Folder Structure
+
+```
+YourEvent/
+├── backend/                 # Laravel application
+│   ├── app/
+│   ├── config/
+│   ├── database/
+│   ├── public/
+│   ├── resources/
+│   ├── storage/
+│   ├── .env
+│   ├── .env.example
+│   ├── composer.json
+│   └── package.json
+├── frontend/                # Next.js application
+│   ├── app/
+│   ├── components/
+│   ├── pages/
+│   ├── public/
+│   ├── .env.local
+│   ├── .env.example
+│   ├── next.config.js
+│   └── package.json
+├── docker/                  # Docker configurations
+│   ├── php/
+│   │   ├── Dockerfile       # Laravel PHP-FPM + Supervisor
+│   │   └── supervisor.conf  # Queue worker config
+│   ├── nginx/
+│   │   └── default.conf     # Nginx configuration
+│   └── node/
+│       └── Dockerfile       # Next.js Node.js
+├── docker-compose.yml       # Main orchestration file
+└── README.md               # This documentation
+```
+
+## 🎯 Key Benefits
+
+✅ **Clean separation** - Each service has its own container  
+✅ **Scalable architecture** - Easy to scale individual services  
+✅ **Developer friendly** - Hot reload and live code editing  
+✅ **Production ready** - Proper networking and volume management  
+✅ **Maintainable** - Clear folder structure and documentation
